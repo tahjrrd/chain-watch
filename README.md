@@ -12,6 +12,9 @@ facilities, Special Focus program counts (SFF and candidates), staff
 turnover, and red-flag rates. From a ranking you can open a chain's facility
 footprint on a map, then the red flags on any single facility.
 
+<img width="2236" height="1612" alt="image" src="https://github.com/user-attachments/assets/e70a1c5b-4018-4d10-8189-284e46b3cee4" />
+
+
 ## Verification
 
 Every statistic shown is computed from the bundled CMS files at startup, not
