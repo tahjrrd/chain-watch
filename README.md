@@ -25,6 +25,15 @@ the single difference traced to an exact .05 floating-point boundary where
 two rounding implementations legitimately disagree at display level.
 Details in DESIGN_NOTES.md.
 
+## How this was built
+
+Built in a single 90-minute timebox. Claude Code generated most of the code
+under my direction: parallel agents built the backend and frontend against an
+API contract I fixed up front, and separate adversarial-review agents
+recomputed every statistic from the raw CSVs before anything shipped. The
+framing, scope, and product decisions are mine. Full methodology in
+DESIGN_NOTES.md.
+
 ## Why this doesn't already exist
 
 The two serious public tools in this space are facility-level. CMS Care
@@ -134,9 +143,3 @@ data/       Dataset file(s)
 No deep links (view state is not in the URL), no uncertainty intervals on
 small-chain rates (see DESIGN_NOTES's analyst notes), and fines reflect CMS's
 trailing ~3-year reporting window bucketed by inspection date.
-
-## AI assistance
-
-This project was built with Claude Code doing most of the code generation under
-my direction. The framing, scope, and product decisions are my own. All dataset
-statistics were verified computationally against the file in `data/`.
