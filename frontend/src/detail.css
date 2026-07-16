@@ -1,0 +1,377 @@
+/* Detail-view dossier styles. All classes prefixed "dsr-" so nothing
+   collides with App.css. Imported from ChainDetail.tsx. Neutral palette +
+   #b91c1c red / #b45309 amber / #2563eb accent only. */
+
+/* ---- Dossier header ---- */
+.dsr-summary {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+  max-width: 900px;
+  margin: 2px 0 2px;
+}
+.dsr-summary .dsr-red {
+  color: var(--text);
+  font-weight: 600;
+}
+.dsr-summary .dsr-strong {
+  font-weight: 600;
+}
+
+.dsr-rank {
+  font-size: 12px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.dsr-rank .dsr-rank-num {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Primary stats: large, hierarchical */
+.dsr-primary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+@media (max-width: 760px) {
+  .dsr-primary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.dsr-pstat {
+  background: var(--surface);
+  padding: 10px 14px 11px;
+  min-width: 0;
+}
+.dsr-pstat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-2);
+  margin-bottom: 3px;
+}
+.dsr-pstat-value {
+  font-size: 23px;
+  font-weight: 650;
+  line-height: 1.05;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.dsr-pstat-value.dsr-value-red {
+  color: var(--danger);
+}
+.dsr-pstat-value.dsr-value-phrase {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.dsr-pstat-sub {
+  font-size: 11.5px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+.dsr-pstat-sub.dsr-sub-red {
+  color: var(--danger);
+  font-weight: 600;
+}
+.dsr-abuse-pill {
+  display: inline-block;
+  background: #fdecec;
+  color: var(--danger);
+  border: 1px solid #f3caca;
+  border-radius: 10px;
+  padding: 1px 9px;
+  font-size: 19px;
+  font-weight: 650;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Secondary stats: small row */
+.dsr-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.dsr-sstat {
+  padding: 5px 13px;
+  border-right: 1px solid var(--border);
+  min-width: 72px;
+}
+.dsr-sstat:last-child {
+  border-right: none;
+}
+.dsr-sstat-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-2);
+}
+.dsr-sstat-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.dsr-sstat-value.dsr-value-red {
+  color: var(--danger);
+}
+
+/* ---- Compact facility table ---- */
+.detail-grid.dsr-chain-grid {
+  grid-template-columns: 340px 1fr;
+}
+@media (max-width: 900px) {
+  .detail-grid.dsr-chain-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dsr-fac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  table-layout: auto;
+}
+.dsr-fac-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border-strong);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 6px 6px;
+  white-space: nowrap;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  z-index: 1;
+}
+.dsr-fac-table th.dsr-num,
+.dsr-fac-table td.dsr-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.dsr-fac-table tbody td {
+  padding: 6px 6px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  white-space: nowrap;
+  height: 32px;
+  box-sizing: border-box;
+}
+.dsr-fac-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.dsr-fac-name {
+  font-weight: 600;
+  color: var(--text);
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dsr-fac-city {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-2);
+}
+.dsr-rating-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--text);
+}
+.dsr-rating-num.dsr-rating-low {
+  color: var(--danger);
+}
+
+/* Compact red-tinted flag chips */
+.dsr-flags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.dsr-flag-chip {
+  display: inline-block;
+  background: #fdecec;
+  color: #b91c1c;
+  border-radius: 10px;
+  padding: 0 5px;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* ---- Map ---- */
+.dsr-map-wrap {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+.dsr-map-legend {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 500;
+  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 5px 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.dsr-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.dsr-legend-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  flex: 0 0 auto;
+}
+.dsr-legend-note {
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+/* ---- Fine timeline trend caption ---- */
+.dsr-trend {
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+/* ---- Facility detail benchmark context ---- */
+.dsr-bench {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+.dsr-cell-breach {
+  color: var(--danger);
+  font-weight: 600;
+}
+.dsr-flag-item .flag-label {
+  font-weight: 600;
+}
+
+/* ---- Near-me decision aid ---- */
+.nm-stats {
+  margin: 12px 0;
+}
+.nm-stats .nm-pct {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Worth-a-look callout — green accented */
+.nm-worth {
+  border: 1px solid var(--border);
+  border-left: 4px solid #2e7d52;
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 10px 14px 12px;
+  margin: 0 0 12px;
+}
+.nm-worth-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #2e7d52;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.nm-worth-note {
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+.nm-worth-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nm-worth-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  font: inherit;
+}
+.nm-worth-item:hover .nm-worth-name {
+  color: var(--accent, #2563eb);
+  text-decoration: underline;
+}
+.nm-worth-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.nm-worth-meta {
+  font-size: 12px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Approach-with-caution line */
+.nm-caution {
+  font-size: 12.5px;
+  color: var(--text);
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+.nm-caution-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--danger, #b91c1c);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Near-me map — fixed height so the shared map fills it */
+.nm-map {
+  position: relative;
+  height: 380px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 0 12px;
+}
+
+/* Sort toggle row */
+.nm-sort {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 10px;
+}
