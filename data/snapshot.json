@@ -1,0 +1,94 @@
+{
+  "release": {
+    "provider_file": "NH_ProviderInfo_Jun2026.csv",
+    "penalties_file": "NH_Penalties_Jun2026.csv",
+    "provider_cms_modified": "2026-06-01",
+    "penalties_cms_modified": "2026-06-01",
+    "processing_date": "2026-06-01"
+  },
+  "aggregates": {
+    "facilities": 14695,
+    "chains": 635,
+    "independents": 4207,
+    "pct_facilities_in_chains": 71.4,
+    "total_fines_dollars": 459054863,
+    "abuse_flag_count": 1465
+  },
+  "worst_chains_by_fines_per_facility": [
+    {
+      "chain_id": "762",
+      "chain_name": "ICARE CONSULTING SERVICES",
+      "fines_per_facility": 381637
+    },
+    {
+      "chain_id": "88",
+      "chain_name": "BRIA HEALTH SERVICES",
+      "fines_per_facility": 362792
+    },
+    {
+      "chain_id": "777",
+      "chain_name": "SABA HEALTHCARE",
+      "fines_per_facility": 284146
+    },
+    {
+      "chain_id": "875",
+      "chain_name": "JENMAX GROUP",
+      "fines_per_facility": 276898
+    },
+    {
+      "chain_id": "804",
+      "chain_name": "EVERCARE SKILLED NURSING",
+      "fines_per_facility": 213586
+    },
+    {
+      "chain_id": "746",
+      "chain_name": "AXIOM HEALTHCARE",
+      "fines_per_facility": 210991
+    },
+    {
+      "chain_id": "827",
+      "chain_name": "ARK POST ACUTE NETWORK",
+      "fines_per_facility": 202377
+    },
+    {
+      "chain_id": "322",
+      "chain_name": "THE LOFT REHABILITATION AND NURSING",
+      "fines_per_facility": 194321
+    },
+    {
+      "chain_id": "870",
+      "chain_name": "GENERATIONS HEALTHCARE NETWORK",
+      "fines_per_facility": 189235
+    },
+    {
+      "chain_id": "699",
+      "chain_name": "GOLDWATER CARE",
+      "fines_per_facility": 179177
+    },
+    {
+      "chain_id": "35",
+      "chain_name": "ANEW HEALTHCARE",
+      "fines_per_facility": 172346
+    },
+    {
+      "chain_id": "307",
+      "chain_name": "LEGACY NURSING & REHABILITATION",
+      "fines_per_facility": 168670
+    },
+    {
+      "chain_id": "854",
+      "chain_name": "LINEAGE HEALTHCARE",
+      "fines_per_facility": 164664
+    },
+    {
+      "chain_id": "42",
+      "chain_name": "ARCADIA CARE",
+      "fines_per_facility": 163391
+    },
+    {
+      "chain_id": "740",
+      "chain_name": "HARMONY CARE GROUP",
+      "fines_per_facility": 156900
+    }
+  ]
+}

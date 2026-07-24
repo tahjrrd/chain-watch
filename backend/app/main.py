@@ -9,6 +9,7 @@ these in-memory structures (only filtering/sorting happens per request).
 from __future__ import annotations
 
 import math
+import re
 from pathlib import Path
 from typing import Any
 
@@ -17,8 +18,35 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
-CSV_PATH = DATA_DIR / "NH_ProviderInfo_Jun2026.csv"
-PENALTIES_CSV_PATH = DATA_DIR / "NH_Penalties_Jun2026.csv"
+
+# CMS ships these files month-stamped (e.g. NH_ProviderInfo_Jun2026.csv) and
+# reissues them periodically. Resolve the newest release present in data/ so the
+# monthly refresh job (scripts/refresh_data.py) takes effect just by dropping in
+# new files — no code edit per refresh. Falls back to the pinned filename.
+_MONTHS = {
+    m: i
+    for i, m in enumerate(
+        ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        start=1,
+    )
+}
+
+
+def _latest_release(prefix: str, fallback: str) -> Path:
+    """Newest data/<prefix>_MonYYYY.csv by (year, month); fallback if none."""
+    def sort_key(path: Path) -> tuple[int, int]:
+        m = re.match(rf"{prefix}_([A-Z][a-z]{{2}})(\d{{4}})$", path.stem)
+        if not m:
+            return (0, 0)
+        return (int(m.group(2)), _MONTHS.get(m.group(1), 0))
+
+    matches = sorted(DATA_DIR.glob(f"{prefix}_*.csv"), key=sort_key)
+    return matches[-1] if matches else DATA_DIR / fallback
+
+
+CSV_PATH = _latest_release("NH_ProviderInfo", "NH_ProviderInfo_Jun2026.csv")
+PENALTIES_CSV_PATH = _latest_release("NH_Penalties", "NH_Penalties_Jun2026.csv")
 
 app = FastAPI(title="Chain Watch API")
 

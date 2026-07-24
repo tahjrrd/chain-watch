@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/
+
+# Refresh job artifact (regenerated each run; only the PR body, not committed)
+refresh_pr_body.md

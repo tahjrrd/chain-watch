@@ -1,10 +1,22 @@
 """Smoke tests for the Chain Watch API — one per endpoint plus error cases."""
 
+import json
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from app.main import app
 
 client = TestClient(app)
+
+# Headline aggregates are pinned to data/snapshot.json rather than magic numbers,
+# so the monthly data-refresh job (scripts/refresh_data.py) updates the expected
+# values in the same PR that changes the data — keeping this a real regression
+# guard on the pipeline without going red on every legitimate CMS refresh.
+SNAPSHOT = json.loads(
+    (Path(__file__).resolve().parents[2] / "data" / "snapshot.json").read_text()
+)
+AGG = SNAPSHOT["aggregates"]
 
 
 def test_overview():
@@ -23,7 +35,9 @@ def test_overview():
         "processing_date",
     ):
         assert k in d
-    assert d["facilities"] == 14695
+    assert d["facilities"] == AGG["facilities"]
+    assert d["chains"] == AGG["chains"]
+    assert d["total_fines_dollars"] == AGG["total_fines_dollars"]
     assert 0 < d["chains"] < d["facilities"]
     assert d["thresholds"]["heavy_fines_dollars"] > 0
     assert d["thresholds"]["high_turnover_pct"] > 0
