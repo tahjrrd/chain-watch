@@ -1,0 +1,77 @@
+name: Monthly data refresh
+
+  # Keeps Chain Watch's CMS source data current. Runs on a schedule (and on a
+  # manual button), downloads a newer CMS release if one exists, recomputes the
+  # snapshot, and opens a pull request for review. No API keys or secrets: the
+  # CMS data is public, and PR creation uses the token GitHub provides for free.
+
+  on:
+    schedule:
+      # 3rd of each month, 12:00 UTC. CMS typically republishes on the 1st;
+      # the extra couple of days is slack for their release timing.
+      - cron: "0 12 3 * *"
+    workflow_dispatch: {}   # adds a "Run workflow" button in the Actions tab
+
+  permissions:
+    contents: write         # push the refresh branch
+    pull-requests: write    # open the PR
+
+  jobs:
+    refresh:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out repo
+          uses: actions/checkout@v4
+
+        - name: Install uv
+          uses: astral-sh/setup-uv@v5
+
+        - name: Sync backend dependencies
+          working-directory: backend
+          run: uv sync
+
+        - name: Refresh CMS data
+          id: refresh
+          run: uv run --project backend python scripts/refresh_data.py
+
+        - name: Run backend tests against refreshed data
+          if: steps.refresh.outputs.changed == 'true'
+          working-directory: backend
+          run: uv run pytest -q
+
+        - name: Open pull request
+          if: steps.refresh.outputs.changed == 'true'
+          uses: peter-evans/create-pull-request@v6
+          with:
+            branch: data-refresh/auto
+            title: "Data refresh: ${{ steps.refresh.outputs.release }}"
+            body-path: refresh_pr_body.md
+            commit-message: "Refresh CMS data to ${{ steps.refresh.outputs.release }}"
+
+※ recap: You built a monthly CMS data-refresh automation for Chain Watch; the script and code are pushed and passing tests. Next, add the workflow file at .github/workflows/refresh-data.yml through GitHub's web editor, since the CLI can't push it without the workflow scope. (disable recaps in /config)
+
+❯ wait what do i paste in .github/workflows/refresh-data.yml and then what do i do next
+
+
+
+
+
+
+          body-path: refresh_pr_body.md
+          commit-message: "Refresh CMS data to ${{ steps.refresh.outputs.release }}"
+          add-paths: |
+            data/*.csv
+            data/snapshot.json
+            add-paths: |
+              data/*.csv
+              data/snapshot.json
+
+  How to create the file:
+  1. Go to https://github.com/tahjrrd/chain-watch
+  2. Click Add file → Create new file
+  3. In the filename box type exactly: .github/workflows/refresh-data.yml
+  (typing the slashes auto-creates the folders)
+  4. Paste the block above into the big editor area
+  5. Scroll down, click the green Commit changes…, keep "Commit directly to the main branch", confirm
+
+  Step 2 — enable PR cr
