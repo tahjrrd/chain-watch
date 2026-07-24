@@ -35,7 +35,8 @@ under my direction: parallel agents built the backend and frontend against an
 API contract I fixed up front, and separate adversarial-review agents
 recomputed every statistic from the raw CSVs before anything shipped. The
 framing, scope, and product decisions are mine. Full methodology in
-DESIGN_NOTES.md.
+DESIGN_NOTES.md. The dataset is also exposed as an MCP server so any agent can 
+query it directly — see [MCP.md](MCP.md).
 
 ## Why this doesn't already exist
 
