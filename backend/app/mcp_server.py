@@ -37,6 +37,13 @@ mcp = FastMCP(
 )
 
 
+def _validate_limit(limit: int, maximum: int) -> int:
+    """Enforce the documented context bound: limit must be in [1, maximum]."""
+    if not 1 <= limit <= maximum:
+        raise ValueError(f"limit must be between 1 and {maximum}")
+    return limit
+
+
 def _call(fn, *args, **kwargs) -> dict[str, Any]:
     """Invoke an API route function, translating HTTP errors to tool errors."""
     try:
@@ -72,7 +79,8 @@ def rank_chains(
         state: two-letter state; keeps chains with at least one facility
             there (aggregates remain national).
         min_facilities: minimum facilities in the chain.
-        size_band: one of small (2-9), medium (10-24), large (25+).
+        size_band: one of single (exactly 1 facility), small (2-5),
+            medium (6-24), large (25+).
         ownership: for_profit, non_profit, or government (majority type).
         has_abuse: True keeps only chains with at least one abuse-flagged
             facility.
@@ -81,8 +89,10 @@ def rank_chains(
             sff_count, avg_turnover, or other fields the API accepts;
             invalid values return the valid list in the error.
         descending: sort direction.
-        limit: rows returned (keep small; each row is verbose).
+        limit: rows returned, between 1 and 100 (keep small; each row is
+            verbose).
     """
+    limit = _validate_limit(limit, 100)
     result = _call(
         api.chains,
         q=q,
@@ -97,11 +107,12 @@ def rank_chains(
     # Trim for context economy: the web UI paginates client-side; an LLM
     # should not receive 635 chains unless it asks for them.
     chains = result.get("chains", [])
+    selected = chains[:limit]
     return {
         "total_matching": result.get("total", len(chains)),
-        "returned": min(limit, len(chains)),
+        "returned": len(selected),
         "sort_by": sort_by,
-        "chains": chains[: max(1, min(limit, 100))],
+        "chains": selected,
     }
 
 
@@ -120,8 +131,11 @@ def search_facilities(
     limit: int = 25,
 ) -> dict[str, Any]:
     """Search individual facilities by name substring and/or state.
-    Returns lightweight rows with CCN identifiers for facility_detail()."""
-    return _call(api.facilities_search, q=q, state=state, limit=min(limit, 50))
+    Returns lightweight rows with CCN identifiers for facility_detail().
+    limit must be between 1 and 50."""
+    return _call(
+        api.facilities_search, q=q, state=state, limit=_validate_limit(limit, 50)
+    )
 
 
 @mcp.tool()

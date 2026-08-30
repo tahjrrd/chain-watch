@@ -33,6 +33,15 @@ def test_rank_chains_default_sort_and_limit():
     fpf = [c["fines_per_facility"] for c in r["chains"]]
     assert fpf == sorted(fpf, reverse=True)
 
+    with pytest.raises(ValueError, match="limit"):
+        call(m.rank_chains, limit=0)
+
+    with pytest.raises(ValueError, match="limit"):
+        call(m.rank_chains, limit=-1)
+
+    with pytest.raises(ValueError, match="limit"):
+        call(m.rank_chains, limit=101)
+
 
 def test_rank_chains_matches_api_directly():
     """The MCP surface must agree with the API computation path exactly."""
@@ -60,6 +69,15 @@ def test_facility_search_and_detail():
     first = s["facilities"][0]
     fd = call(m.facility_detail, first["ccn"])
     assert fd["name"] == first["name"]
+
+    with pytest.raises(ValueError, match="limit"):
+        call(m.search_facilities, limit=0)
+
+    with pytest.raises(ValueError, match="limit"):
+        call(m.search_facilities, limit=-1)
+
+    with pytest.raises(ValueError, match="limit"):
+        call(m.search_facilities, limit=51)
 
 
 def test_facilities_near_and_bad_zip():
