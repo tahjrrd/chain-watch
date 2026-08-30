@@ -143,3 +143,9 @@ data/       Dataset file(s)
 No deep links (view state is not in the URL), no uncertainty intervals on
 small-chain rates (see DESIGN_NOTES's analyst notes), and fines reflect CMS's
 trailing ~3-year reporting window bucketed by inspection date.
+Portfolio artifact, not a production service
+Local operation only; no hosted deployment
+No production authentication or observability
+No frontend behavioral tests
+No general pull-request CI
+Read-only MCP surface
