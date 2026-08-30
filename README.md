@@ -1,103 +1,119 @@
 # Chain Watch
 
-**Rank nursing-home operators — not just homes — by conduct.**
+**Rank nursing-home operators—not just individual homes—by conduct.**
 
-CMS Care Compare rates nursing homes one facility at a time. But 71.4% of
-facilities belong to a chain, and the operator behind a home is invisible when
-you only look at that home. Chain Watch shifts the unit of analysis from the
-facility to the chain. A family vetting the company that runs a home, a
-journalist, or a regulator can rank chains by accountability signals: total
-fines (CMS reports roughly the trailing three years), abuse-flagged
-facilities, Special Focus program counts (SFF and candidates), staff
-turnover, and red-flag rates. From a ranking you can open a chain's facility
-footprint on a map, then the red flags on any single facility.
+CMS Care Compare evaluates nursing homes one facility at a time. But 71.4% of facilities in the bundled dataset belong to a chain, making operator-level patterns difficult to see when each home is considered in isolation.
 
-<img width="2236" height="1612" alt="image" src="https://github.com/user-attachments/assets/e70a1c5b-4018-4d10-8189-284e46b3cee4" />
+Chain Watch changes the unit of analysis from the facility to the operator. A family, journalist, analyst, or regulator can rank chains using accountability signals including fines, abuse citations, Special Focus Facility status, staff turnover, and red-flag rates. From the ranking, users can inspect a chain's complete facility footprint and then drill into the evidence behind an individual facility's flags.
 
+<img width="2236" height="1612" alt="Chain Watch operator ranking dashboard with chain-level accountability metrics" src="https://github.com/user-attachments/assets/e70a1c5b-4018-4d10-8189-284e46b3cee4" />
 
 ## Verification
 
-Every statistic shown is computed from the bundled CMS files at startup, not
-hardcoded or estimated. The methodology was checked three ways:
-our chain averages reproduce CMS's own published "Chain Average Overall
-5-star Rating" within 0.05 stars for 98.1% of all 635 chains; the provider
-file's fine totals, the penalties file's independently summed records, and
-the UI's timelines agree to the dollar on spot-checked chains; and a
-36-point raw-CSV recompute across three chains matched 35 checks exactly;
-the single difference traced to an exact .05 floating-point boundary where
-two rounding implementations legitimately disagree at display level.
-Details in DESIGN_NOTES.md.
+Every statistic shown is computed from the bundled CMS source files at application startup rather than hardcoded or estimated.
+
+The June 2026 snapshot was checked in three ways:
+
+1. **Methodology against CMS:** Independently computed chain-average ratings reproduce CMS's published "Chain Average Overall 5-star Rating" within 0.05 stars for 98.1% of the 635 chains in the snapshot.
+
+2. **Cross-file reconciliation:** For spot-checked chains, provider-file fine totals, independently summed penalty records, and the user interface's fine timelines agree to the dollar.
+
+3. **Raw-data recomputation:** A separate 36-point recomputation across three chains matched 35 checks exactly. The remaining difference was traced to an exact `.05` floating-point boundary that two rounding implementations displayed differently; the underlying value agreed.
+
+The full methodology, limitations, and analytical tradeoffs are documented in [DESIGN_NOTES.md](DESIGN_NOTES.md).
 
 ## How this was built
 
-The initial end-to-end application was built in a 90-minute timebox. The MCP server and monthly refresh workflow were added later. Claude Code generated most of the implementation under my 
-direction; I owned the problem framing, scope, API contract, acceptance criteria, adversarial verification, and shipping decisions.
-The repository includes a local MCP server exposing six bounded tools through the same backend computation path. A compatible MCP client can use it after cloning and configuring the repository; it is not a hosted public endpoint.
+The initial end-to-end application was built in a 90-minute timebox. The MCP server and monthly data-refresh workflow were added later.
 
-## Why this doesn't already exist
+Claude Code generated most of the implementation under my direction. I owned the problem selection, operator-level product framing, scope, API contract, acceptance criteria, adversarial verification requirements, review, and shipping decisions.
 
-The two serious public tools in this space are facility-level. CMS Care
-Compare is a facility finder: search a home, see its stars. ProPublica's
-Nursing Home Inspect is an inspection-report search engine: full-text search
-across hundreds of thousands of deficiency reports, one facility at a time.
-Both answer "how is this home?" Neither answers "how is the company that
-runs it?" You can see that a home is owned by a chain, but nowhere can you
-rank operators by conduct, normalized for size, across their whole footprint.
-That's the gap Chain Watch fills, and the dataset supports it: CMS added chain
-columns to the provider file, and 71.4% of facilities belong to one.
+The repository includes a local MCP server exposing six bounded, read-only tools through the same backend computation path used by the API. A compatible MCP client can use those tools after cloning and configuring the repository; there is no hosted public MCP endpoint.
+
+See [API_CONTRACT.md](API_CONTRACT.md) for the shared interface and [MCP.md](MCP.md) for the MCP tool surface and local setup.
+
+## Why I built it
+
+The two established public tools I evaluated are primarily facility-level:
+
+- CMS Care Compare helps users find a nursing home and review its ratings.
+- ProPublica's Nursing Home Inspect supports inspection-report research and facility-level investigation.
+
+Neither is designed to rank operators across their complete facility footprints using normalized conduct signals. Although the CMS data identifies facilities associated with chains, operator-level patterns remain difficult to evaluate from facility pages alone.
+
+Chain Watch explores that product gap by making the operator the primary unit of analysis while preserving the ability to drill down to the underlying facilities and evidence.
 
 ## The 90-second tour
 
-1. The app opens on large chains (25+ facilities) with a computed headline —
-   for example, a 149-facility operator where every single home carries a
-   red flag. Change any filter and the headline recomputes for that slice.
-2. Click the top chain. The dossier shows its rank among all 635 chains,
-   fines per facility against the national average, a fines-by-year trend,
-   and every facility on a severity-coded map.
-3. Click a facility. Each red flag states the actual value and the
-   percentile threshold that triggered it.
-4. Hit "Near me" and enter a ZIP. You get the flagged facilities nearby, the
-   nearest abuse-cited home, and the three nearest clean 4+ star options.
+1. The application opens on large chains with 25 or more facilities. A computed headline surfaces an unusual accountability signal for the active filter selection.
+
+2. Select a chain to view its rank, fines per facility, fines per bed, national comparisons, fines by year, and complete facility footprint.
+
+3. Select a facility to inspect each red flag, the underlying value, and the percentile threshold that triggered it.
+
+4. Use **Near me** to find flagged facilities near a ZIP code, identify the nearest abuse-cited facility, and see nearby facilities that meet the tool's clean four-star-or-better criteria.
 
 ## Features
 
-- Chains ranked by accountability signals, normalized two ways (fines per
-  facility and per bed), segmented by size band, with search, state,
-  ownership, and abuse-citation filters
-- A dynamic headline: an insight engine scores several candidate facts
-  (worst fines/facility, abuse-citation share, all-flagged operators, worst
-  turnover, ownership rating gap) for the active slice and surfaces the most
-  extreme one
-- Facility search: typing a facility name (not just a chain) surfaces matching
-  facilities inline, so independents are reachable too
-- "Near me": enter a ZIP for a decision aid — summary stats, a severity map,
-  the nearest abuse-cited facility, and a "worth a look" shortlist of clean
-  4+ star homes nearby (GeoNames ZIP centroids, resolved locally)
-- Chain detail with the full facility footprint plotted on a map
-- Per-chain fine timeline: fines-by-year bar chart on chain and facility detail,
-  built by joining the second CMS file, `NH_Penalties_Jun2026.csv`, so you can
-  see whether an operator is trending better or worse
-- Per-facility red flags: abuse citation, special-focus status, stale
-  inspection, recent ownership change, high turnover, heavy fines, low staffing
-- National context bar (facilities, chains, fines, abuse flags)
-- Red-flag thresholds computed from the dataset's own percentiles, not
-  hardcoded
+- Chain rankings based on accountability signals
+- Normalization by facility count and certified bed count
+- Size bands separating small, medium, and large operators
+- Search, state, ownership, and abuse-citation filters
+- Dynamic headlines computed for the active result set
+- Facility-name search, including independent facilities
+- Chain-level facility maps
+- Per-chain and per-facility fine timelines
+- Facility-level explanations for every red flag
+- ZIP-based nearby-facility analysis
+- National context for facilities, chains, fines, and abuse flags
+- Thresholds computed from the bundled dataset rather than fixed constants
+- Six bounded, read-only MCP tools over the shared backend computation path
+
+## Architecture
+
+```text
+CMS provider and penalties CSVs
+        |
+        v
+Pandas startup load and precomputation
+        |
+        +--> Facility flags and chain aggregates
+        |
+        +--> FastAPI endpoints --> React/TypeScript interface
+        |
+        +--> Six FastMCP tools
+```
+
+The API and MCP layers reuse the same backend functions rather than maintaining separate analytical implementations.
 
 ## Requirements
 
-- Python 3.12+ managed via [uv](https://docs.astral.sh/uv/) (`brew install uv`)
-- Node.js 20+ (`brew install node`)
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/)
+- Node.js 20+
+- npm
 
 ## Setup
 
-```bash
-# Backend
-cd backend
-uv sync
+Clone the repository:
 
-# Frontend
+```bash
+git clone https://github.com/tahjrrd/chain-watch.git
+cd chain-watch
+```
+
+Install the backend dependencies:
+
+```bash
+cd backend
+uv sync --frozen
+```
+
+Install the frontend dependencies:
+
+```bash
 cd ../frontend
-npm install
+npm ci
 ```
 
 ## Run
@@ -108,44 +124,112 @@ From the project root:
 ./dev.sh
 ```
 
-Or run the two halves separately:
+Alternatively, run the backend and frontend separately.
+
+Backend:
 
 ```bash
-# Terminal 1 — API on http://localhost:8000
-cd backend && uv run uvicorn app.main:app --reload --port 8000
-
-# Terminal 2 — UI on http://localhost:5173
-cd frontend && npm run dev
+cd backend
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
-Then open http://localhost:5173.
+Frontend:
 
-Coverage is national: all 50 states plus DC and the territories CMS
-certifies (53 jurisdictions).
+```bash
+cd frontend
+npm run dev
+```
 
-The data is bundled in `data/` — no download needed. It is the CMS Provider
-Data Catalog "Provider Information" file (June 2026 refresh),
-`NH_ProviderInfo_Jun2026.csv`, plus the CMS Penalties file
-(`NH_Penalties_Jun2026.csv`) and the CMS data dictionary PDF. ZIP centroids
-for the near-me search come from `us_zip_centroids.csv`, derived from the
-GeoNames postal database (CC BY 4.0, geonames.org).
+Then open [http://localhost:5173](http://localhost:5173).
+
+## Testing
+
+The repository currently includes 35 backend, API, and MCP tests.
+
+Run the backend suite:
+
+```bash
+cd backend
+uv sync --frozen
+uv run pytest -q
+```
+
+Run the frontend checks:
+
+```bash
+cd frontend
+npm ci
+npm run lint
+npm run build
+```
+
+The backend test suite and frontend production build pass on the current main branch. Behavioral frontend test coverage has not yet been added.
+
+## Data
+
+The current main branch contains the June 2026 CMS snapshot:
+
+- `NH_ProviderInfo_Jun2026.csv`
+- `NH_Penalties_Jun2026.csv`
+- CMS nursing-home data dictionary
+- Locally resolved ZIP centroids derived from the GeoNames postal database
+
+The snapshot contains:
+
+- 14,695 facilities
+- 635 chains
+- 53 CMS jurisdictions, covering all 50 states, Washington, DC, and the territories represented in the source data
+
+CMS reports fines over an approximately three-year trailing window. Fine timelines are bucketed by inspection date.
+
+ZIP centroids are derived from the GeoNames postal database under CC BY 4.0.
+
+## Automated data refresh
+
+A scheduled GitHub Actions workflow checks for a newer CMS provider and penalties release each month.
+
+When new data is available, the workflow:
+
+1. Downloads and validates the source files.
+2. Recomputes the aggregate snapshot through the existing backend pipeline.
+3. Runs the backend test suite against the refreshed data.
+4. Produces a human-readable summary of the changes.
+5. Opens a pull request for review.
+
+The workflow does not merge data automatically. Refreshes remain behind a human review step so that aggregate changes, documentation, and analytical assumptions can be evaluated together.
 
 ## Project structure
 
-```
-backend/    FastAPI app (data loading, analysis endpoints)
-frontend/   React + Vite UI
-data/       Dataset file(s)
+```text
+backend/
+  app/main.py          FastAPI application and shared data computations
+  app/mcp_server.py    Six read-only MCP tools
+  tests/               Backend, API, and MCP tests
+
+frontend/              React and TypeScript user interface
+data/                  Bundled CMS source files and computed snapshot
+scripts/               Monthly CMS refresh logic
+.github/workflows/     Scheduled refresh automation
+
+API_CONTRACT.md        Shared backend/frontend contract
+DESIGN_NOTES.md        Product decisions, validation, and analytical limits
+MCP.md                 MCP tool definitions and local setup
 ```
 
-## Known limits
+## Scope and known limits
 
-No deep links (view state is not in the URL), no uncertainty intervals on
-small-chain rates (see DESIGN_NOTES's analyst notes), and fines reflect CMS's
-trailing ~3-year reporting window bucketed by inspection date.
-Portfolio artifact, not a production service
-Local operation only; no hosted deployment
-No production authentication or observability
-No frontend behavioral tests
-No general pull-request CI
-Read-only MCP surface
+Chain Watch is a portfolio artifact rather than a production service. Its current scope is intentionally constrained:
+
+- Local operation only; there is no hosted deployment
+- Read-only API and MCP surfaces
+- No production authentication, authorization, or observability
+- No frontend behavioral test coverage
+- No general pull-request CI
+- No deep links because view state is not encoded in the URL
+- No uncertainty intervals for small-chain rates
+- A single monthly snapshot rather than a historical panel
+- Reliance on CMS Chain IDs, which can contain false splits or stale ownership relationships
+- Fines reflect CMS's trailing approximately three-year reporting window
+- Accessibility work remains before this could become a public production service
+
+See [DESIGN_NOTES.md](DESIGN_NOTES.md) for a more detailed discussion of the analytical limitations and the next improvements I would prioritize.
