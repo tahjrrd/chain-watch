@@ -12,13 +12,13 @@ Chain Watch changes the unit of analysis from the facility to the operator. A fa
 
 Every statistic shown is computed from the bundled CMS source files at application startup rather than hardcoded or estimated.
 
-The June 2026 snapshot was checked in three ways:
+The July 2026 snapshot was checked in three ways:
 
-1. **Methodology against CMS:** Independently computed chain-average ratings reproduce CMS's published "Chain Average Overall 5-star Rating" within 0.05 stars for 98.1% of the 635 chains in the snapshot.
+1. **Methodology against CMS:** Independently computed chain-average ratings reproduce CMS's published "Chain Average Overall 5-star Rating" within 0.05 stars for 98.7% of the 634 chains in the snapshot (the remaining differences sit exactly on the 0.05 rounding boundary).
 
 2. **Cross-file reconciliation:** For spot-checked chains, provider-file fine totals, independently summed penalty records, and the user interface's fine timelines agree to the dollar.
 
-3. **Raw-data recomputation:** A separate 36-point recomputation across three chains matched 35 checks exactly. The remaining difference was traced to an exact `.05` floating-point boundary that two rounding implementations displayed differently; the underlying value agreed.
+3. **Raw-data recomputation:** A separate 36-point recomputation across three chains matched all 36 checks exactly. (The same check on the June snapshot surfaced one display-rounding difference at an exact `.05` floating-point boundary; the underlying value agreed.)
 
 The full methodology, limitations, and analytical tradeoffs are documented in [DESIGN_NOTES.md](DESIGN_NOTES.md).
 
@@ -167,17 +167,17 @@ The backend test suite and frontend production build pass on the current main br
 
 ## Data
 
-The current main branch contains the June 2026 CMS snapshot:
+The current main branch contains the July 2026 CMS snapshot:
 
-- `NH_ProviderInfo_Jun2026.csv`
-- `NH_Penalties_Jun2026.csv`
+- `NH_ProviderInfo_Jul2026.csv`
+- `NH_Penalties_Jul2026.csv`
 - CMS nursing-home data dictionary
 - Locally resolved ZIP centroids derived from the GeoNames postal database
 
 The snapshot contains:
 
-- 14,695 facilities
-- 635 chains
+- 14,693 facilities
+- 634 chains
 - 53 CMS jurisdictions, covering all 50 states, Washington, DC, and the territories represented in the source data
 
 CMS reports fines over an approximately three-year trailing window. Fine timelines are bucketed by inspection date.

@@ -21,10 +21,10 @@ modes, in both directions: false splits, where one real operator hides
 behind multiple corporate names and receives multiple Chain IDs (the
 per-operator numbers understate); and staleness, where an ownership change
 mid-window attributes a prior operator's fines to the current one (the
-`Provider Changed Ownership in Last 12 Months` column would flag this, but
-it is uniformly "N" in this refresh, so the tool cannot see it). I checked
-what could be checked: CMS's declared per-chain facility count equals the
-in-file count for all 635 chains this refresh, and independents (28.6% of
+`Provider Changed Ownership in Last 12 Months` column flags this for 50
+facilities in this refresh, and the ownership-change red flag surfaces it).
+I checked what could be checked: CMS's declared per-chain facility count
+equals the in-file count for all 634 chains this refresh, and independents (28.6% of
 facilities) are reachable through facility search rather than silently
 dropped. Real entity resolution against the CMS ownership file is the first
 thing I would add with more time.
@@ -40,15 +40,15 @@ for a journalist). Account systems, saved searches, and export did not. I
 would rather ship the drill-down working than three half-built tabs.
 
 The dataset supports the chain framing directly. Abuse-flagged facilities
-average 1.64 stars against 3.16 for unflagged. 44.7% of facilities have been
-fined, with a median fine total of $33,677 among those fined and a max of
-$883,180. There are 86 Special Focus Facilities and 440 SFF candidates.
-Deficiency count correlates with rating at r = -0.572. These are facility-level
+average 1.60 stars against 3.14 for unflagged. 44.8% of facilities have been
+fined, with a median fine total of $33,924 among those fined and a max of
+$973,967. There are 88 Special Focus Facilities and 440 SFF candidates.
+Deficiency count correlates with rating at r = -0.575. These are facility-level
 facts; aggregating them to the chain is what this tool adds.
 
 ## Tradeoffs
 
-- **Pandas in memory, not a database.** 14,695 rows and 99 columns fit in
+- **Pandas in memory, not a database.** 14,693 rows and 99 columns fit in
   memory with room to spare. A database would add setup and deployment cost for
   no query I actually run. If the data grew or needed joins across CMS files,
   this would change.
@@ -59,7 +59,7 @@ facts; aggregating them to the chain is what this tool adds.
   percentile of turnover; heavy fines is the 90th percentile of nonzero facility
   fine totals. These are computed at load and reused in the flag logic, rather
   than hardcoded numbers that drift from the data. Median nursing staff turnover
-  is 45.3%, so the threshold sits well above
+  is 44.9%, so the threshold sits well above
   the middle of the distribution.
 - **Per-facility normalization as the default ranking.** Sorting chains by
   total fines rewards small bad operators with invisibility — the largest
@@ -74,11 +74,11 @@ facts; aggregating them to the chain is what this tool adds.
 - **Size bands instead of one ranking.** A 3-facility operator and a
   200-facility chain are different populations, so chains are segmented into
   small (2–5 facilities), medium (6–24), and large (25+). In this refresh the
-  bands hold 143, 399, and 93 chains respectively; CMS assigns a Chain ID only
+  bands hold 145, 396, and 93 chains respectively; CMS assigns a Chain ID only
   at 2+ facilities, so there are no single-facility chains to exclude.
 - **Second CMS file for the fine timeline.** The chain and facility detail views
-  show a fines-by-year bar chart built by joining `NH_Penalties_Jun2026.csv`
-  (dated fine records) to the provider file on CCN; every one of its 13,710 fine
+  show a fines-by-year bar chart built by joining `NH_Penalties_Jul2026.csv`
+  (dated fine records) to the provider file on CCN; every one of its 13,687 fine
   rows matched a facility in the provider file (100% join rate), so no fine is
   dropped for lack of a match. Payment-denial rows are counted but excluded from
   the dollar timeline.
@@ -87,9 +87,9 @@ facts; aggregating them to the chain is what this tool adds.
 - **Expose data problems, don't patch them.** Five facilities report exactly
   0.000 RN hours and turnover caps at exactly 100% — both left as-is, since
   silently editing source data is worse for an accountability tool than
-  showing it. One red flag (ownership change in the last 12 months) can never
-  fire on this refresh because the column is uniformly "N"; the logic stays
-  for future refreshes where the field is populated.
+  showing it. The ownership-change red flag, which could never fire on the
+  June refresh (the column was uniformly "N"), now fires for the 50
+  facilities CMS marks as changing ownership in the last 12 months.
 
 ## Analyst notes
 
@@ -108,7 +108,7 @@ Judged as analysis rather than software, the choices that matter:
   operators from the default view felt like the wrong side of the tradeoff
   for an accountability tool.
 - **The ownership gradient replicates the literature.** For-profit facilities
-  in this refresh average 2.83 stars vs 3.59 non-profit and 3.30 government,
+  in this refresh average 2.81 stars vs 3.58 non-profit and 3.28 government,
   with higher turnover and abuse-flag rates — consistent with a large
   peer-reviewed literature on ownership and nursing-home quality. The tool
   makes that gradient a filter rather than a buried crosstab.
@@ -124,21 +124,21 @@ Three layers of verification, all run against the shipped files:
 
 - **Methodology vs CMS.** The dataset carries CMS's own "Chain Average
   Overall 5-star Rating." Our independently computed chain average matches it
-  within 0.05 stars for 98.1% of all 635 chains (max difference 0.05 —
-  CMS rounds to one decimal). The chain-average construct is CMS's own,
-  reproduced.
-- **Cross-file consistency.** For spot-checked chains, the provider file's
-  fine total, the penalties file's independently summed fine records, and the
-  UI's fines-by-year timeline agree to the dollar (e.g. one 15-facility chain:
-  $5,441,883 in all three).
+  within 0.05 stars for 98.7% of all 634 chains (max difference 0.05 —
+  CMS rounds to one decimal, and the remaining differences sit exactly on
+  that 0.05 boundary). The chain-average construct is CMS's own, reproduced.
+- **Cross-file consistency.** For the three highest-fined chains, the
+  provider file's fine total, the penalties file's independently summed fine
+  records, and the UI's fines-by-year timeline agree to the dollar (e.g. one
+  281-facility chain: $8,841,332 in all three).
 - **Raw-CSV drill-down.** Three chains were recomputed from the raw CSVs
   across twelve metrics each (facilities, rating averages, turnover, fines,
-  beds, normalized metrics, abuse and Special Focus counts, penalties) and
-  diffed against the live API: 35 of 36 checks matched exactly. The one
-  difference was investigated to ground truth: an averaged turnover of
-  exactly 37.55 sits on a floating-point .05 boundary that Python's and
-  NumPy's rounding render as 37.5 and 37.6 respectively — the underlying
-  mean matches exactly; only the display rounding differs.
+  beds, normalized metrics, abuse and Special Focus counts) and diffed
+  against the live API: all 36 checks matched exactly. (The same check on
+  the June refresh surfaced one display-rounding difference — an averaged
+  turnover of exactly 37.55 on a floating-point .05 boundary that Python's
+  and NumPy's rounding render as 37.5 and 37.6 respectively; the underlying
+  mean agreed.)
 
 ## What I'd do with more time
 

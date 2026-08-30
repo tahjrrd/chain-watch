@@ -45,8 +45,8 @@ def _latest_release(prefix: str, fallback: str) -> Path:
     return matches[-1] if matches else DATA_DIR / fallback
 
 
-CSV_PATH = _latest_release("NH_ProviderInfo", "NH_ProviderInfo_Jun2026.csv")
-PENALTIES_CSV_PATH = _latest_release("NH_Penalties", "NH_Penalties_Jun2026.csv")
+CSV_PATH = _latest_release("NH_ProviderInfo", "NH_ProviderInfo_Jul2026.csv")
+PENALTIES_CSV_PATH = _latest_release("NH_Penalties", "NH_Penalties_Jul2026.csv")
 
 app = FastAPI(title="Chain Watch API")
 

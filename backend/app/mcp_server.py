@@ -108,7 +108,7 @@ def rank_chains(
         descending=descending,
     )
     # Trim for context economy: the web UI paginates client-side; an LLM
-    # should not receive 635 chains unless it asks for them.
+    # should not receive hundreds of chains unless it asks for them.
     chains = result.get("chains", [])
     selected = chains[:limit]
     return {

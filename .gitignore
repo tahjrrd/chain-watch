@@ -8,6 +8,7 @@ __pycache__/
 
 # Node
 node_modules/
+frontend/dist/
 
 # Refresh job artifact (regenerated each run; only the PR body, not committed)
 refresh_pr_body.md

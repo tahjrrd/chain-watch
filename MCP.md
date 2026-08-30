@@ -18,8 +18,8 @@ disagreement impossible. The computation path itself is checked against CMS's
 own published figures (see the main README's Verification section).
 
 Outputs are trimmed for context economy: `rank_chains` returns a bounded page
-(default 25) rather than all 635 chains, because an LLM context window is not
-a browser table.
+(default 25) rather than hundreds of chains, because an LLM context window is
+not a browser table.
 
 ## Tools
 
