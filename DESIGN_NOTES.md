@@ -123,10 +123,11 @@ Judged as analysis rather than software, the choices that matter:
 Three layers of verification, all run against the shipped files:
 
 - **Methodology vs CMS.** The dataset carries CMS's own "Chain Average
-  Overall 5-star Rating." Our independently computed chain average matches it
-  within 0.05 stars for 98.7% of all 634 chains (max difference 0.05 —
-  CMS rounds to one decimal, and the remaining differences sit exactly on
-  that 0.05 boundary). The chain-average construct is CMS's own, reproduced.
+  Overall 5-star Rating." Our independently computed chain average differs
+  by no more than 0.05 stars from CMS's published value for all 634 chains.
+  Of those, 603 (95.1%) differ by less than 0.05; the remaining 31 differ by
+  exactly 0.05 because of display rounding (CMS rounds to one decimal). The
+  chain-average construct is CMS's own, reproduced.
 - **Cross-file consistency.** For the three highest-fined chains, the
   provider file's fine total, the penalties file's independently summed fine
   records, and the UI's fines-by-year timeline agree to the dollar (e.g. one

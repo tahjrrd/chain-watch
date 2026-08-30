@@ -14,7 +14,7 @@ Every statistic shown is computed from the bundled CMS source files at applicati
 
 The July 2026 snapshot was checked in three ways:
 
-1. **Methodology against CMS:** Independently computed chain-average ratings reproduce CMS's published "Chain Average Overall 5-star Rating" within 0.05 stars for 98.7% of the 634 chains in the snapshot (the remaining differences sit exactly on the 0.05 rounding boundary).
+1. **Methodology against CMS:** Our independently computed chain average differs by no more than 0.05 stars from CMS's published "Chain Average Overall 5-star Rating" for all 634 chains in the snapshot. Of those, 603 (95.1%) differ by less than 0.05; the remaining 31 differ by exactly 0.05 because of display rounding.
 
 2. **Cross-file reconciliation:** For spot-checked chains, provider-file fine totals, independently summed penalty records, and the user interface's fine timelines agree to the dollar.
 
