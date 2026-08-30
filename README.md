@@ -30,13 +30,9 @@ Details in DESIGN_NOTES.md.
 
 ## How this was built
 
-Built in a single 90-minute timebox. Claude Code generated most of the code
-under my direction: parallel agents built the backend and frontend against an
-API contract I fixed up front, and separate adversarial-review agents
-recomputed every statistic from the raw CSVs before anything shipped. The
-framing, scope, and product decisions are mine. Full methodology in
-DESIGN_NOTES.md. The dataset is also exposed as an MCP server so any agent can 
-query it directly — see [MCP.md](MCP.md).
+The initial end-to-end application was built in a 90-minute timebox. The MCP server and monthly refresh workflow were added later. Claude Code generated most of the implementation under my 
+direction; I owned the problem framing, scope, API contract, acceptance criteria, adversarial verification, and shipping decisions.
+The repository includes a local MCP server exposing six bounded tools through the same backend computation path. A compatible MCP client can use it after cloning and configuring the repository; it is not a hosted public endpoint.
 
 ## Why this doesn't already exist
 
