@@ -3,9 +3,11 @@
 Exposes the Chain Watch dataset (CMS nursing-home provider + penalty files)
 to MCP clients such as Claude Code and Claude Desktop.
 
-Design: this is a thin adapter over the existing FastAPI backend. Every tool
-calls the same functions that serve the web API, so the MCP surface and the
-web UI can never disagree about a number. No statistics are recomputed here.
+Design: this is a thin adapter over the existing FastAPI backend. Every MCP
+tool calls the same backend functions used by the web API, reducing duplicated
+business logic. A contract test asserts equality for the covered ranked-chain
+path; shared code reduces divergence risk but does not make disagreement
+impossible. No statistics are recomputed here.
 
 Run (from backend/):
     uv run python -m app.mcp_server
@@ -84,10 +86,11 @@ def rank_chains(
         ownership: for_profit, non_profit, or government (majority type).
         has_abuse: True keeps only chains with at least one abuse-flagged
             facility.
-        sort_by: fines_per_facility (default), total_fines, fines_per_bed,
-            avg_overall, facilities, red_flag_rate, abuse_facilities,
-            sff_count, avg_turnover, or other fields the API accepts;
-            invalid values return the valid list in the error.
+        sort_by: exactly one of fines_per_facility (default), total_fines,
+            total_fines_dollars, fines_per_bed, abuse_count, abuse_rate_pct,
+            avg_overall_rating, avg_turnover_pct, facilities_in_data,
+            flag_rate_pct, penalties_per_facility, or majority_ownership;
+            any other value is rejected with the valid list in the error.
         descending: sort direction.
         limit: rows returned, between 1 and 100 (keep small; each row is
             verbose).
@@ -148,8 +151,9 @@ def facility_detail(ccn: str) -> dict[str, Any]:
 
 @mcp.tool()
 def facilities_near(zip_code: str) -> dict[str, Any]:
-    """Facilities within 40 miles of a 5-digit ZIP code, nearest first,
-    with distance in miles. Useful for 'vet the homes near me' questions."""
+    """Facilities within 40 miles of a ZIP code, nearest first, with
+    distance in miles. Useful for 'vet the homes near me' questions.
+    zip_code must be exactly five digits (e.g. "60622")."""
     return _call(api.near, zip=zip_code)
 
 

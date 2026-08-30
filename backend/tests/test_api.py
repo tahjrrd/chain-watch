@@ -246,6 +246,37 @@ def test_near_known_zip():
             "overall_rating", "fines_dollars", "flags", "distance_miles",
         }
 
+    # Regression: 60622 is dense (total > 50), so the summary/decision fields
+    # must cover the FULL radius, not just the capped 50-row page. Recompute
+    # the full hit set from the geo index and check each field against it.
+    from app.main import (
+        FACILITY_GEO, NEAR_RADIUS_MILES, ZIP_CENTROIDS, _haversine_miles,
+    )
+
+    assert d["total"] > 50
+    assert len(facs) == 50
+    clat, clng = ZIP_CENTROIDS["60622"]
+    full = [
+        (dist, f)
+        for f in FACILITY_GEO
+        if (dist := _haversine_miles(clat, clng, f["lat"], f["lng"]))
+        <= NEAR_RADIUS_MILES
+    ]
+    full.sort(key=lambda t: round(t[0], 1))  # mirror the endpoint's sort
+    assert len(full) == d["total"]
+    rated = [f["overall_rating"] for _, f in full if f["overall_rating"] is not None]
+    assert d["avg_overall_rating"] == round(sum(rated) / len(rated), 1)
+    expected_worth = [
+        f["ccn"] for _, f in full
+        if not f["flags"] and (f["overall_rating"] or 0) >= 4
+    ][:3]
+    assert [w["ccn"] for w in d["worth_a_look"]] == expected_worth
+    expected_abuse = next(
+        (f["ccn"] for _, f in full if "abuse" in f["flags"]), None
+    )
+    got_abuse = d["nearest_abuse"]["ccn"] if d["nearest_abuse"] else None
+    assert got_abuse == expected_abuse
+
 
 def test_near_zip_without_facilities_resolves():
     # A residential ZIP with no facilities in it still resolves — via the

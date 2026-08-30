@@ -96,6 +96,35 @@ name; `limit` validated 1–50 (422 outside that range). Returns
 `{total, facilities: [{ccn, name, city, state, chain_name, overall_rating,
 flags}]}` with flags as string keys.
 
+## GET /api/near?zip=
+Facilities within 40 miles of a 5-digit ZIP, nearest first. `zip` must be
+exactly five digits (422 on wrong length via HTTP, 400 on nonnumeric; the
+function itself rejects any non-5-digit value so direct callers such as the
+MCP server get the same boundary). Centroid resolves via the bundled GeoNames
+table, falling back to facility-derived exact-ZIP then 3-digit-prefix
+centroids; 404 when nothing resolves.
+```json
+{
+  "zip": "60622", "centroid": {"lat": 41.9, "lng": -87.68},
+  "resolved_by": "zip", "total": 250,
+  "flagged_total": 140, "abuse_total": 12,
+  "avg_overall_rating": 2.9,
+  "worth_a_look": [{"...facility row...": "up to 3"}],
+  "nearest_abuse": {"...facility row...": "or null"},
+  "facilities": [{"ccn": "...", "name": "...", "city": "...", "state": "IL",
+    "chain_name": "...", "overall_rating": 2, "fines_dollars": 10000,
+    "flags": ["abuse"], "lat": 41.9, "lng": -87.7, "distance_miles": 0.4}]
+}
+```
+`facilities` is capped at the nearest 50 rows (map/table page). All summary
+and decision fields cover the FULL radius, not just the capped page:
+`total`/`flagged_total`/`abuse_total` count every hit within 40 miles;
+`avg_overall_rating` averages all rated facilities in the radius (null if
+none rated); `worth_a_look` is up to the nearest 3 facilities in the radius
+with no flags and overall rating ≥ 4; `nearest_abuse` is the nearest
+abuse-flagged facility in the radius (null if none). Frontends must consume
+these fields rather than recomputing them from the capped `facilities` array.
+
 ## GET /api/facilities/{ccn}
 Full facility detail: identity, ownership type, chain (id+name if any),
 all ratings, staffing hours (reported + adjusted RN/total), turnover,

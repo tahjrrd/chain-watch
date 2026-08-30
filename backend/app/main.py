@@ -674,8 +674,11 @@ NEAR_LIMIT = 50
 
 @app.get("/api/near")
 def near(zip: str = Query(..., min_length=5, max_length=5)):
-    if not zip.isdigit():
-        raise HTTPException(400, "ZIP must be 5 digits")
+    # Validate here, not just in the Query declaration: FastAPI only enforces
+    # the length bounds on HTTP requests, and this function is also called
+    # directly (MCP server, tests). [0-9] not \d — no Unicode digits.
+    if not isinstance(zip, str) or not re.fullmatch(r"[0-9]{5}", zip):
+        raise HTTPException(400, "ZIP must be exactly 5 digits")
     resolved_by = "zip"
     centroid = ZIP_CENTROIDS.get(zip)
     if centroid is None:
@@ -706,9 +709,16 @@ def near(zip: str = Query(..., min_length=5, max_length=5)):
                 }
             )
     hits.sort(key=lambda h: h["distance_miles"])
-    # Summary counts are over the full radius, not just the capped list.
+    # Summary and decision fields are computed over the full radius, not just
+    # the capped display list — the page is only the nearest NEAR_LIMIT rows.
     flagged_total = sum(1 for h in hits if h["flags"])
     abuse_total = sum(1 for h in hits if "abuse" in h["flags"])
+    rated = [h["overall_rating"] for h in hits if h["overall_rating"] is not None]
+    avg_overall_rating = round(sum(rated) / len(rated), 1) if rated else None
+    worth_a_look = [
+        h for h in hits if not h["flags"] and (h["overall_rating"] or 0) >= 4
+    ][:3]
+    nearest_abuse = next((h for h in hits if "abuse" in h["flags"]), None)
     return {
         "zip": zip,
         "centroid": {"lat": round(clat, 4), "lng": round(clng, 4)},
@@ -716,6 +726,9 @@ def near(zip: str = Query(..., min_length=5, max_length=5)):
         "total": len(hits),
         "flagged_total": flagged_total,
         "abuse_total": abuse_total,
+        "avg_overall_rating": avg_overall_rating,
+        "worth_a_look": worth_a_look,
+        "nearest_abuse": nearest_abuse,
         "facilities": hits[:NEAR_LIMIT],
     }
 

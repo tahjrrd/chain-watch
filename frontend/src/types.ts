@@ -85,6 +85,11 @@ export type NearResponse = {
   total: number
   flagged_total: number
   abuse_total: number
+  // Summary/decision fields computed server-side over the FULL radius —
+  // never recompute these from the capped `facilities` page.
+  avg_overall_rating: number | null
+  worth_a_look: NearbyFacility[]
+  nearest_abuse: NearbyFacility | null
   facilities: NearbyFacility[]
 }
 

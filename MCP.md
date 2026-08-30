@@ -1,18 +1,21 @@
 # Chain Watch MCP Server
 
 Chain Watch's dataset is also exposed as an [MCP](https://modelcontextprotocol.io)
-server, so any MCP client (Claude Code, Claude Desktop, or your own agent) can
+server, so an MCP client (Claude Code, Claude Desktop, or your own agent) can
 query nursing-home operator conduct directly: rank chains, pull a chain's
-dossier, inspect a facility's red flags, or find facilities near a ZIP.
+dossier, inspect a facility's red flags, or find facilities near a ZIP. The
+server runs locally: a client can query the data after cloning this repository
+and configuring the server as shown below — it is not a hosted endpoint.
 
 ## Design
 
 The server (`backend/app/mcp_server.py`) is a thin adapter over the existing
-FastAPI backend. Every tool calls the same functions that serve the web API,
-so the MCP surface and the web UI cannot disagree about a number — there is
-one computation path, verified against CMS's own published figures (see the
-main README's Verification section). A dedicated test
-(`test_rank_chains_matches_api_directly`) asserts the two surfaces stay equal.
+FastAPI backend. Every MCP tool calls the same backend functions used by the
+web API, reducing duplicated business logic. A contract test
+(`test_rank_chains_matches_api_directly`) asserts equality for the covered
+ranked-chain path; shared code reduces divergence risk but does not make
+disagreement impossible. The computation path itself is checked against CMS's
+own published figures (see the main README's Verification section).
 
 Outputs are trimmed for context economy: `rank_chains` returns a bounded page
 (default 25) rather than all 635 chains, because an LLM context window is not

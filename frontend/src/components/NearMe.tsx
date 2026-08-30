@@ -68,31 +68,15 @@ export function NearMe({ onBack, onSelectFacility }: Props) {
   const flagged = data ? data.flagged_total : 0
   const abuse = data ? data.abuse_total : 0
 
-  // Everything below is computed from the fetched list — no hardcoded numbers.
+  // `facilities` is the capped nearest-50 page (map/table only). Summary and
+  // decision fields come from the server, computed over the full radius.
   const facilities = data?.facilities ?? []
+  const avgOverall = data?.avg_overall_rating ?? null
+  const worthALook = data?.worth_a_look ?? []
+  const nearestAbuse = data?.nearest_abuse ?? null
 
-  const avgOverall = useMemo(() => {
-    const rated = facilities
-      .map((f) => f.overall_rating)
-      .filter((r): r is number => r !== null && !Number.isNaN(r))
-    if (rated.length === 0) return null
-    return rated.reduce((s, r) => s + r, 0) / rated.length
-  }, [facilities])
-
-  // Facilities are returned nearest-first, so the first match is the nearest.
-  const worthALook = useMemo(
-    () =>
-      facilities
-        .filter((f) => f.flags.length === 0 && (f.overall_rating ?? 0) >= 4)
-        .slice(0, 3),
-    [facilities],
-  )
+  // Facilities are returned nearest-first, so the first row is the nearest.
   const nearestAny = facilities[0] ?? null
-
-  const nearestAbuse = useMemo(
-    () => facilities.find((f) => f.flags.includes('abuse')) ?? null,
-    [facilities],
-  )
 
   const displayed = useMemo(
     () => (sort === 'nearest' ? facilities : [...facilities].sort(concerningCompare)),
@@ -109,7 +93,10 @@ export function NearMe({ onBack, onSelectFacility }: Props) {
       <div className="note">
         Enter a ZIP code to see facilities within 40 miles, ranked by distance.
         Flags mark abuse citations, Special Focus status, stale inspections, high
-        turnover, heavy fines, and low staffing.
+        turnover, heavy fines, and low staffing. Chain Watch is a screening aid
+        based on CMS public data, not a care-quality determination or
+        recommendation. Verify current inspection and licensing information
+        before making decisions.
       </div>
 
       <form className="controls" onSubmit={search}>

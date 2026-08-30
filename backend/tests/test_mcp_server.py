@@ -85,6 +85,11 @@ def test_facilities_near_and_bad_zip():
     assert len(n["facilities"]) > 0
     with pytest.raises(ValueError, match="404|400"):
         call(m.facilities_near, "00000")
+    # The 5-digit ZIP boundary must hold on direct calls too, where FastAPI
+    # request validation is bypassed.
+    for bad in ("123", "1000", "123456", "abcde"):
+        with pytest.raises(ValueError, match="400.*ZIP"):
+            call(m.facilities_near, bad)
 
 
 def test_stdio_protocol_roundtrip():
