@@ -1,0 +1,53 @@
+name: CI
+
+# Runs the backend test suite and the frontend lint and production build on
+# every pull request and on pushes to main. Read-only: no secrets, no deploy.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Sync backend dependencies
+        working-directory: backend
+        run: uv sync --frozen
+
+      - name: Run backend tests
+        working-directory: backend
+        run: uv run pytest -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build

@@ -209,7 +209,7 @@ backend/
 frontend/              React and TypeScript user interface
 data/                  Bundled CMS source files and computed snapshot
 scripts/               Monthly CMS refresh logic
-.github/workflows/     Scheduled refresh automation
+.github/workflows/     Monthly data refresh and pull-request CI
 
 API_CONTRACT.md        Shared backend/frontend contract
 DESIGN_NOTES.md        Product decisions, validation, and analytical limits
@@ -225,7 +225,6 @@ Chain Watch is a portfolio artifact rather than a production service. Its curren
 - Read-only API and MCP surfaces
 - No production authentication, authorization, or observability
 - No frontend behavioral test coverage
-- No general pull-request CI
 - No deep links because view state is not encoded in the URL
 - No uncertainty intervals for small-chain rates
 - A single monthly snapshot rather than a historical panel
