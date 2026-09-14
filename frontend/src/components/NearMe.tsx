@@ -70,7 +70,7 @@ export function NearMe({ onBack, onSelectFacility }: Props) {
 
   // `facilities` is the capped nearest-50 page (map/table only). Summary and
   // decision fields come from the server, computed over the full radius.
-  const facilities = data?.facilities ?? []
+  const facilities = useMemo(() => data?.facilities ?? [], [data])
   const avgOverall = data?.avg_overall_rating ?? null
   const worthALook = data?.worth_a_look ?? []
   const nearestAbuse = data?.nearest_abuse ?? null

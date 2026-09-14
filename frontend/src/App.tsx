@@ -4,7 +4,6 @@ import { getOverview } from './api'
 import { fmtInt, fmtMoney, fmtPct } from './format'
 import { ChainTable } from './components/ChainTable'
 import type { ChainFilters } from './components/ChainTable'
-import { DEFAULT_CHAIN_FILTERS } from './components/ChainTable'
 import { NearMe } from './components/NearMe'
 import { ChainDetail } from './components/ChainDetail'
 import { FacilityDetail } from './components/FacilityDetail'
@@ -15,6 +14,20 @@ type View =
   | { kind: 'near' }
   | { kind: 'chain'; chainId: string }
   | { kind: 'facility'; ccn: string; fromChainId?: string }
+
+const DEFAULT_CHAIN_FILTERS: ChainFilters = {
+  query: '',
+  state: '',
+  // Land on large national operators: recognizable names, and per-facility
+  // rates over 25+ facilities are statistically sturdy. One click widens to All.
+  band: 'large',
+  ownership: '',
+  hasAbuse: false,
+  // First load: flagged share, ties broken by size — the biggest fully
+  // flagged operators lead, matching the computed headline above the table.
+  sortBy: 'flag_rate_pct',
+  descending: true,
+}
 
 function App() {
   const [overview, setOverview] = useState<Overview | null>(null)

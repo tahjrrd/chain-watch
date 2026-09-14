@@ -24,20 +24,6 @@ export type ChainFilters = {
   descending: boolean
 }
 
-export const DEFAULT_CHAIN_FILTERS: ChainFilters = {
-  query: '',
-  state: '',
-  // Land on large national operators: recognizable names, and per-facility
-  // rates over 25+ facilities are statistically sturdy. One click widens to All.
-  band: 'large',
-  ownership: '',
-  hasAbuse: false,
-  // First load: flagged share, ties broken by size — the biggest fully
-  // flagged operators lead, matching the computed headline above the table.
-  sortBy: 'flag_rate_pct',
-  descending: true,
-}
-
 type Props = {
   overview: Overview | null
   filters: ChainFilters
@@ -538,7 +524,7 @@ function sliceSubject(filters: ChainFilters): string {
  * identical inputs always yield the identical insight. Returns null for an
  * empty slice.
  */
-export function buildInsight(
+function buildInsight(
   chains: ChainSummary[],
   baseline: ChainSummary[] | null,
   overview: Overview,
