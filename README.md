@@ -213,6 +213,7 @@ scripts/               Monthly CMS refresh logic
 
 API_CONTRACT.md        Shared backend/frontend contract
 DESIGN_NOTES.md        Product decisions, validation, and analytical limits
+LICENSE                MIT license for the code
 MCP.md                 MCP tool definitions and local setup
 ```
 
